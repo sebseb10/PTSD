@@ -35,6 +35,7 @@ let e3 = Prim("+", Prim("*", Var "b", CstI 9), Var "a");;
 
 (* Evaluation within an environment *)
 
+(* Here is changes for the Assignment *)
 let rec eval e (env : (string * int) list) : int =
     match e with
     | CstI i            -> i
@@ -59,11 +60,14 @@ let e1v  = eval e1 env;;
 let e2v1 = eval e2 env;;
 let e2v2 = eval e2 [("a", 314)];;
 let e3v  = eval e3 env;;
+
+(* Here is changes for the Assignment *)
 let exampleExpression1 = eval (Prim ("max", CstI 42, CstI 22)) env;;
 let exampleExpression2 = eval (Prim ("min", CstI 42, CstI 21)) env;;
 let exampleExpression3 = eval (Prim ("==", CstI 67, CstI 42)) env;;
 let exampleExpression4 = eval (Prim ("==", CstI 67, CstI 67)) env;;
 
+(* Here is changes for the Assignment *)
 type aexpr =
   | CstI of int
   | Var of string
@@ -71,6 +75,7 @@ type aexpr =
   | Mul of aexpr * aexpr
   | Sub of aexpr * aexpr  
 
+(* Here is changes for the Assignment *)
 let rec fmt a =
     match a with
     | CstI x -> string x
@@ -78,7 +83,8 @@ let rec fmt a =
     | Add (e1,e2) -> "( " + (fmt e1) + " + " + (fmt e2) + " )"
     | Mul (e1,e2) -> "( " + (fmt e1) + " * " + (fmt e2) + " )"
     | Sub (e1,e2) -> "( " + (fmt e1) + " * " + (fmt e2) + " )"
-    
+
+(* Here is changes for the Assignment *)    
 let rec simplify a =
     match a with
     | CstI n -> CstI n
@@ -96,6 +102,7 @@ let rec simplify a =
     | Sub (e1, e2) -> (Sub (simplify e1, simplify e2))
     | _ -> a
 
+(* Here is changes for the Assignment *)
 let rec diff a x =
     match a with
     | CstI _ -> CstI 0
@@ -104,6 +111,7 @@ let rec diff a x =
     | Sub (e1,e2) -> Sub (diff e1 x, diff e2 x)
     | Mul (e1,e2) -> Add (Mul (diff e1 x, e2), Mul (e1, diff e2 x))
 
+(* Here is changes for the Assignment *)
 let aExampleExpression1 = Sub (Var "v", Add (Var "w", Var "z"))
 let aExampleExpression2 = Mul (CstI 2, Sub (Var "v", Add (Var "w", Var "z")))
 let aExampleExpression3 = Add (Var "x", Add (Var "y", Add (Var "z", Var "v")))
