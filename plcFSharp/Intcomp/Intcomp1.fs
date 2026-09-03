@@ -80,7 +80,7 @@ let rec mem x vs =
 
 (* Checking whether an expression is closed.  The vs is 
    a list of the bound variables.  *)
-
+(*
 let rec closedin (e : expr) (vs : string list) : bool =
     match e with
     | CstI i -> true
@@ -186,7 +186,7 @@ let e8s1a = subst e8s0 [("z", CstI 100)];;
 
 // Shows renaming of bound variable z (to z3), avoiding capture of free z
 let e9s1a = subst e9s0 [("y", Var "z")];;
-
+*)
 (* ---------------------------------------------------------------------- *)
 
 (* Free variables *)
@@ -365,12 +365,23 @@ type stackvalue =
 
 (* Compilation to a list of instructions for a unified-stack machine *)
 
+let rec assemble (inss : sinstr list)=
+    match (inss) with
+    | [] -> []
+    | SCstI i :: inst -> 0 :: i :: (assemble inst)
+    | SVar v :: inst -> 1 :: v :: (assemble inst)
+    | SAdd :: inst -> 2 :: (assemble inst)
+    | SSub :: inst -> 3 :: (assemble inst)
+    | SMul :: inst -> 4 :: (assemble inst)
+    | SPop :: inst -> 5 :: (assemble inst)
+    | SSwap :: inst -> 6 :: (assemble inst)
 let rec scomp (e : expr) (cenv : stackvalue list) : sinstr list =
     match e with
     | CstI i -> [SCstI i]
     | Var x  -> [SVar (getindex cenv (Bound x))]
-    | Let(x, erhs, ebody) -> 
-          scomp erhs cenv @ scomp ebody (Bound x :: cenv) @ [SSwap; SPop]
+    | Let ([], ebody) -> scomp ebody cenv 
+    | Let((x, erhs)::rest, ebody) -> 
+          scomp erhs cenv @ scomp (Let(rest, ebody)) (Bound x :: cenv) @ [SSwap; SPop]
     | Prim("+", e1, e2) -> 
           scomp e1 cenv @ scomp e2 (Value :: cenv) @ [SAdd] 
     | Prim("-", e1, e2) -> 
@@ -378,6 +389,8 @@ let rec scomp (e : expr) (cenv : stackvalue list) : sinstr list =
     | Prim("*", e1, e2) -> 
           scomp e1 cenv @ scomp e2 (Value :: cenv) @ [SMul] 
     | Prim _ -> failwith "scomp: unknown operator";;
+
+let comp e s = scomp e s |> assemble
 
 let s1 = scomp e1 [];;
 let s2 = scomp e2 [];;

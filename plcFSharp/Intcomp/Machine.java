@@ -16,16 +16,39 @@
    This is a Java program but might be written in C instead; it does
    not rely on object-orientation or garbage collection.  */
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.StringTokenizer;
+
 class Machine {
   final static int 
     SCST = 0, SVAR = 1, SADD = 2, SSUB = 3, SMUL = 4, SPOP = 5, SSWAP = 6;
   
   public static void main(String[] args) {
-    final int[] rpn1 = { SCST, 17, SVAR, 0, SVAR, 1, SADD, SSWAP, SPOP };
-    System.out.println(seval(rpn1));
-    final int[] rpn2 = { SCST, 17, SCST, 22, SCST, 100, SVAR, 1, SMUL, 
+      try{
+      String fname = args[0];
+      String contents = Files.readString(Path.of(fname));
+      StringTokenizer st = new StringTokenizer(contents);
+      ArrayList<Integer> codeList = new ArrayList<>();
+      while (st.hasMoreTokens()) {
+          String token = st.nextToken();
+          codeList.add(Integer.parseInt(token));
+      }
+      int[] code = new int[codeList.size()];
+      for (int i = 0; i < codeList.size(); i++) {
+          code[i] = codeList.get(i);
+      }
+      System.out.println(seval(code));
+
+      final int[] rpn1 = { SCST, 17, SVAR, 0, SVAR, 1, SADD, SSWAP, SPOP };
+      System.out.println(seval(rpn1));
+      final int[] rpn2 = { SCST, 17, SCST, 22, SCST, 100, SVAR, 1, SMUL, 
 			 SSWAP, SPOP, SVAR, 1, SADD, SSWAP, SPOP };
-    System.out.println(seval(rpn2));
+      System.out.println(seval(rpn2));
+      } catch (Exception e) {
+          System.out.println("Error reading file: " + e.getMessage());
+      }
   }
 
   static int seval(int[] code) {
